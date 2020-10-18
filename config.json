@@ -3,23 +3,28 @@
     "questions": [
         {
             "question": "What secondary school am I from?",
-            "answer_options": ["Hwa Chong", "River Valley", "Dunman High"]
+            "answer_options": ["Hwa Chong", "River Valley", "Dunman High"],
+            "correct_answer": 1
         },
         {
             "question": "What is my favorite color?",
-            "answer_options": ["Black", "Blue", "Green"]
+            "answer_options": ["Black", "Green", "Blue"],
+            "correct_answer": 2
         },
         {
             "question": "Which floor do I stay on?",
-            "answer_options": ["15th", "17th", "11th"]
+            "answer_options": ["15th", "17th", "11th"],
+            "correct_answer": 0
         },
         {
             "question": "How many siblings do I have?",
-            "answer_options": ["0", "1", "2"]
+            "answer_options": ["0", "1", "2"],
+            "correct_answer": 2
         },
         {
             "question": "What do I major in?",
-            "answer_options": ["Tchoukball", "Computer Science", "Business Analytics"]
+            "answer_options": ["Tchoukball", "Computer Science", "Business Analytics"],
+            "correct_answer": 0
         }
     ]
 }
