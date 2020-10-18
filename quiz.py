@@ -1,21 +1,31 @@
 from telegram import InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler
-import os
+import os, json
 
 bot_token = '1161652378:AAEwBPiWwVTNsv-v_HArYU3NVGhAQAhGXu4'
 PORT = int(os.environ.get('PORT', 5000))
 
 # Stages
-FIRST, SECOND, THIRD, FOURTH, FIFTH, END= range(6)
+RESPOND, END= range(2)
 ONE, TWO, THREE = range(3)
 answer = [0, 1, 2, 0, 2, 0]
+curr_question_dict = dict();
 
+# Messages
+
+with open("config.json", "r") as file:
+    config = json.load(file)
+
+# evaluate function checks whether the user answered the question correctly
+# and stores the result in "context.user_data" dictionary
+# (key = update.effective_chat.id)
+# (value = score)
 def evaluate(update, context, question):
     query = update.callback_query
     query.answer()
     input = query.data
-    print("input:" + input)
-    print("ans: " + str(answer[question]))
+    #print("input:" + input)
+    #print("ans: " + str(answer[question]))
     key = update.effective_chat.id
     if (input == str(answer[question])):
         context.user_data[key] += 1
@@ -23,16 +33,42 @@ def evaluate(update, context, question):
 def start(update, context):
     key = update.effective_chat.id
     context.user_data[key] = 0
+    curr_question_dict[key] = 0
     keyboard = [
             [
                 InlineKeyboardButton("I am ready!", callback_data=str(ONE)),
             ]
         ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text('HOW WELL DO YOU KNOW DOUBLECHINS??? Are you ready to find out?', reply_markup=reply_markup)
+    update.message.reply_text(config["start_message"], reply_markup=reply_markup)
 
     return FIRST
 
+# update is the
+def respond_to_query(update, context):
+    # get curr_question of user
+    curr_question = curr_question_dict[update.effective_chat.id]
+
+    # end conversation if no more questions
+    if (curr_question >= len(config["questions"])):
+        return END
+
+    # Load questions and answer options from json
+    question_reference = config["questions"][curr_state]
+    answer_options = question_reference["answer_options"]
+    question = question_reference["question"]
+
+    keyboard = [
+        [
+            InlineKeyboardButton(answer_options[0], callback_data=str(ONE)),
+            InlineKeyboardButton(answer_options[1], callback_data=str(TWO)),
+            InlineKeyboardButton(answer_options[2], callback_data=str(THREE)),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query = update.callback_query
+    query.edit_message_text(text = question, reply_markup=reply_markup)
+    return RESPOND
 
 def first(update, context):
     query = update.callback_query
@@ -41,7 +77,7 @@ def first(update, context):
         [
             InlineKeyboardButton("Hwa Chong", callback_data=str(ONE)),
             InlineKeyboardButton("River Valley", callback_data=str(TWO)),
-            InlineKeyboardButton("Dunman HIgh", callback_data=str(THREE)),
+            InlineKeyboardButton("Dunman High", callback_data=str(THREE)),
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -107,8 +143,7 @@ def fifth(update, context):
 def end(update, context):
     """Returns `ConversationHandler.END`, which tells the
     ConversationHandler that the conversation is over"""
-    query = update.callback_query
-    query.answer()
+
     evaluate(update, context, 5)
     query = update.callback_query
     score = str(context.user_data[update.effective_chat.id])
@@ -130,6 +165,9 @@ def inline_caps(update, context):
             input_message_content=InputTextMessageContent(query.upper())))
     context.bot.answer_inline_query(update.inline_query.id, results)
 
+def unknown(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
+
 def main():
     updater = Updater(token = bot_token)
     dispatcher = updater.dispatcher
@@ -137,20 +175,8 @@ def main():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            FIRST: [
-                CallbackQueryHandler(first),
-            ],
-            SECOND: [
-                CallbackQueryHandler(second),
-            ],
-            THIRD: [
-                CallbackQueryHandler(third),
-            ],
-            FOURTH: [
-                CallbackQueryHandler(fourth),
-            ],
-            FIFTH: [
-                CallbackQueryHandler(fifth),
+            RESPOND: [
+                CallbackQueryHandler(respond_to_query),
             ],
             END: [
                 CallbackQueryHandler(end),
@@ -160,6 +186,10 @@ def main():
     )
 
     dispatcher.add_handler(conv_handler)
+
+    unknown_handler = MessageHandler(Filters.command, unknown)
+    dispatcher.add_handler(unknown_handler)
+
 
 
     # updater.start_polling()

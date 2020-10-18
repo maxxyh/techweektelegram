@@ -1,0 +1,25 @@
+{
+    "start_message": "HOW WELL DO YOU KNOW DOUBLECHINS??? Are you ready to find out?",
+    "questions": [
+        {
+            "question": "What secondary school am I from?",
+            "answer_options": ["Hwa Chong", "River Valley", "Dunman High"]
+        },
+        {
+            "question": "What is my favorite color?",
+            "answer_options": ["Black", "Blue", "Green"]
+        },
+        {
+            "question": "Which floor do I stay on?",
+            "answer_options": ["15th", "17th", "11th"]
+        },
+        {
+            "question": "How many siblings do I have?",
+            "answer_options": ["0", "1", "2"]
+        },
+        {
+            "question": "What do I major in?",
+            "answer_options": ["Tchoukball", "Computer Science", "Business Analytics"]
+        }
+    ]
+}
