@@ -50,9 +50,15 @@ def quiz(update, context):
 # (key = update.effective_chat.id)
 # (value = score)
 def evaluate(update, context, question):
-    input = context.args[0]
+    if question >= len(answer):
+        return
+    if (len(context.args) > 0):
+        input = context.args[0]
+    else:
+        context.bot.send_message(chat_id = update.effective_chat.id, text="Pls enter a value after /next")
+        return
     user_id = update.effective_chat.id
-    if (input == answer[question]):
+    if (input.lower() == answer[question].lower()):
         context.user_data[user_id] += 1  # store the score here
 
 def next(update, context):
@@ -69,11 +75,12 @@ def next(update, context):
         context.bot.send_message(chat_id = update.effective_chat.id, text = question_2, parse_mode = telegram.ParseMode.MARKDOWN_V2)
     elif curr_question == 3:
         context.bot.send_message(chat_id = update.effective_chat.id, text = question_3, parse_mode = telegram.ParseMode.MARKDOWN_V2)
-    else:
+    elif curr_question == 4:
         score = str(context.user_data[user_id])
         total = str(3)
         context.bot.send_message(chat_id = update.effective_chat.id, text="You scored " + score + "/" + total + "!!!")
-
+    else:
+        context.bot.send_message(chat_id = update.effective_chat.id, text="Pls use /quiz to restart the quiz")
     curr_question_reference[user_id] = curr_question
 
 def unknown(update, context):
