@@ -48,12 +48,15 @@ def start(update, context):
     update.message.reply_text(config["start_message"], reply_markup=reply_markup)
     if "scores" not in context.bot_data: 
         context.bot_data["scores"] = dict()
+    if "old_max_score" in context.bot_data:
+        clear_leaderboard_upon_change(update, context, context.bot_data["old_max_score"])
+    else: 
+        context.bot_data["old_max_score"] = len(config["questions"])
 
-    clear_leaderboard_upon_change(update, context)
     return RESPOND
 
-def clear_leaderboard_upon_change(update, context):
-    if len(context.bot_data["scores"]) != 0 and len(config["questions"]) != min(context.bot_data["scores"].values()):
+def clear_leaderboard_upon_change(update, context, old_max_score):
+    if len(context.bot_data["scores"]) != 0 and len(config["questions"]) != old_max_score:
         clear_leaderboard(update, context)
     context.bot.send_message(chat_id=update.effective_chat.id, text="New quiz found. Clearing old leaderboard.")
 
