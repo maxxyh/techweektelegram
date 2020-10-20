@@ -25,6 +25,11 @@
             "question": "What do I major in?",
             "answer_options": ["Tchoukball", "Computer Science", "Business Analytics"],
             "correct_answer": 0
+        },
+        {
+            "question": "What is my real name?",
+            "answer_options": ["Ek Chin Hui", "Guillermo", "Ben Tay's neighbour"],
+            "correct_answer": 1
         }
     ]
 }
